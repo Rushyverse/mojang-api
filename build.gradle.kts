@@ -10,9 +10,9 @@ plugins {
     jacoco
 }
 
-val javaVersion get() = JavaVersion.VERSION_1_8
+val javaVersion get() = JavaVersion.VERSION_17
 val javaVersionString get() = javaVersion.toString()
-val javaVersionInt get() = 8
+val javaVersionInt get() = javaVersionString.toInt()
 
 detekt {
     // Allows having different behavior for CI.
