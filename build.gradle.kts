@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    val ktorVersion="2.3.3"
+    val ktorVersion="2.3.4"
     val ktSerializationVersion="1.6.0"
     val coroutineVersion="1.7.3"
 
