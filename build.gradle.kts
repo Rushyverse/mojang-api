@@ -34,7 +34,7 @@ repositories {
 
 dependencies {
     val ktorVersion="2.3.5"
-    val ktSerializationVersion="1.6.0"
+    val ktSerializationVersion="1.6.1"
     val coroutineVersion="1.7.3"
 
     implementation("io.ktor:ktor-client-core:$ktorVersion")
