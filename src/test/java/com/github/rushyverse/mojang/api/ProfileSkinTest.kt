@@ -116,5 +116,8 @@ class ProfileSkinTest {
         }
     }
 
-    private fun createRandomProperties() = List(5) { ProfileSkin.Property(name = getRandomString(), getRandomString()) }.toMutableList()
+    private fun createRandomProperties() =
+        generateSequence {
+            ProfileSkin.Property(name = getRandomString(), getRandomString())
+        }.take(5).toMutableList()
 }
