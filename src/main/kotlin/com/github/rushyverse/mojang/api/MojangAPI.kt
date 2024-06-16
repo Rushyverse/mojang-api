@@ -7,12 +7,16 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.request.url
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
+import io.ktor.http.takeFrom
+
+private val mojangApiURL = Url("https://api.mojang.com")
+private val mojangSessionApiURL = Url("https://sessionserver.mojang.com")
 
 /**
  * Allows interacting with Mojang API.
@@ -62,7 +66,8 @@ public class MojangAPIImpl(private val client: HttpClient) : MojangAPI {
     override suspend fun getUUID(name: String): ProfileId? {
         val response =
             client.get {
-                url(scheme = "https", host = "api.mojang.com") {
+                url {
+                    takeFrom(mojangApiURL)
                     appendPathSegments("users", "profiles", "minecraft", name)
                 }
             }
@@ -72,7 +77,8 @@ public class MojangAPIImpl(private val client: HttpClient) : MojangAPI {
     override suspend fun getUUID(names: Collection<String>): List<ProfileId> {
         val response =
             client.post {
-                url(scheme = "https", host = "api.mojang.com") {
+                url {
+                    takeFrom(mojangApiURL)
                     appendPathSegments("profiles", "minecraft")
                 }
                 contentType(ContentType.Application.Json)
@@ -88,7 +94,8 @@ public class MojangAPIImpl(private val client: HttpClient) : MojangAPI {
     override suspend fun getName(uuid: String): ProfileId? {
         val response =
             client.get {
-                url(scheme = "https", host = "api.mojang.com") {
+                url {
+                    takeFrom(mojangApiURL)
                     appendPathSegments("user", "profile", uuid)
                 }
             }
@@ -98,7 +105,8 @@ public class MojangAPIImpl(private val client: HttpClient) : MojangAPI {
     override suspend fun getSkin(uuid: String): ProfileSkin? {
         val response =
             client.get {
-                url(scheme = "https", host = "sessionserver.mojang.com") {
+                url {
+                    takeFrom(mojangSessionApiURL)
                     appendPathSegments("session", "minecraft", "profile", uuid)
                     parameter("unsigned", "false")
                 }
