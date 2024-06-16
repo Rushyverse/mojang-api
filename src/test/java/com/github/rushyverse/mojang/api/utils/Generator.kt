@@ -1,6 +1,6 @@
 package com.github.rushyverse.mojang.api.utils
 
-import java.util.*
+import java.util.UUID
 
 val stringGenerator = generateSequence { UUID.randomUUID().toString() }.distinct().iterator()
 

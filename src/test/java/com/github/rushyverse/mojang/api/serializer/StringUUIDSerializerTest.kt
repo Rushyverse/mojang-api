@@ -3,15 +3,14 @@ package com.github.rushyverse.mojang.api.serializer
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.assertThrows
-import java.util.*
+import java.util.Locale
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class StringUUIDSerializerTest {
-
     @Nested
     inner class Serialize {
-
         @Test
         fun `should serialize a valid uuid with dashes`() {
             val uuid = UUID.randomUUID().toString()
@@ -49,19 +48,17 @@ class StringUUIDSerializerTest {
                 "12345678-12g4-1234-1234-123456789012",
                 "12345678-1234-12q4-1234-123456789012",
                 "12345678-1234-1234-12x4-123456789012",
-                "12345678-1234-1234-1234-12345678901g"
+                "12345678-1234-1234-1234-12345678901g",
             ).forEach {
                 assertThrows<IllegalArgumentException> { Json.encodeToString(StringUUIDSerializer, it) }
             }
         }
 
         private fun stringWrappedInQuotes(string: String) = "\"$string\""
-
     }
 
     @Nested
     inner class Deserialize {
-
         @Test
         fun `should deserialize a valid uuid with dashes`() {
             val uuid = UUID.randomUUID().toString()
@@ -99,7 +96,7 @@ class StringUUIDSerializerTest {
                 "12345678-12g4-1234-1234-123456789012",
                 "12345678-1234-12q4-1234-123456789012",
                 "12345678-1234-1234-12x4-123456789012",
-                "12345678-1234-1234-1234-12345678901g"
+                "12345678-1234-1234-1234-12345678901g",
             ).forEach {
                 assertThrows<IllegalArgumentException> {
                     Json.decodeFromString(StringUUIDSerializer, wrappedInQuotes(it))
@@ -108,6 +105,5 @@ class StringUUIDSerializerTest {
         }
 
         private fun wrappedInQuotes(string: String) = "\"$string\""
-
     }
 }

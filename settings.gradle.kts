@@ -13,6 +13,7 @@ dependencyResolutionManagement {
             version("dokka", "1.9.20")
             version("detekt", "1.23.6")
             version("kover", "0.8.1")
+            version("ktlint", "12.1.1")
 
             // Dependency version
             version("ktor", "2.3.11")
@@ -23,10 +24,12 @@ dependencyResolutionManagement {
             plugin("kt-serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef("kotlin")
             plugin("dokka", "org.jetbrains.dokka").versionRef("dokka")
             plugin("detekt", "io.gitlab.arturbosch.detekt").versionRef("detekt")
+            plugin("ktlint", "org.jlleitschuh.gradle.ktlint").versionRef("ktlint")
             plugin("kover", "org.jetbrains.kotlinx.kover").versionRef("kover")
 
             library("ktor-core", "io.ktor", "ktor-client-core").versionRef("ktor")
             library("ktor-cio", "io.ktor", "ktor-client-cio").versionRef("ktor")
+            library("ktor-logging", "io.ktor", "ktor-client-logging").versionRef("ktor")
             library("ktor-serialization", "io.ktor", "ktor-client-serialization").versionRef("ktor")
             library("ktor-content-negotiation", "io.ktor", "ktor-client-content-negotiation").versionRef("ktor")
             library("ktor-serialization-json", "io.ktor", "ktor-serialization-kotlinx-json").versionRef("ktor")
@@ -38,7 +41,7 @@ dependencyResolutionManagement {
 
             bundle(
                 "ktor",
-                listOf("ktor-core", "ktor-serialization", "ktor-content-negotiation", "ktor-serialization-json")
+                listOf("ktor-core", "ktor-serialization", "ktor-content-negotiation", "ktor-serialization-json"),
             )
         }
     }

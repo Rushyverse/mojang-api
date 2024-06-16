@@ -1,17 +1,23 @@
 package com.github.rushyverse.mojang.api
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.appendPathSegments
+import io.ktor.http.contentType
 
 /**
  * Allows interacting with Mojang API.
  */
 public interface MojangAPI {
-
     /**
      * Allows users to supply a username to be checked and
      * get its UUID if the username resolves to a valid Minecraft profile.
@@ -53,17 +59,25 @@ public interface MojangAPI {
  * @property client Coroutine http client used to interact with api.
  */
 public class MojangAPIImpl(private val client: HttpClient) : MojangAPI {
-
     override suspend fun getUUID(name: String): ProfileId? {
-        val response = client.get("https://api.mojang.com/users/profiles/minecraft/$name")
+        val response =
+            client.get {
+                url(scheme = "https", host = "api.mojang.com") {
+                    appendPathSegments("users", "profiles", "minecraft", name)
+                }
+            }
         return if (response.status == HttpStatusCode.OK) response.body() else null
     }
 
     override suspend fun getUUID(names: Collection<String>): List<ProfileId> {
-        val response = client.post("https://api.mojang.com/profiles/minecraft") {
-            contentType(ContentType.Application.Json)
-            setBody(names)
-        }
+        val response =
+            client.post {
+                url(scheme = "https", host = "api.mojang.com") {
+                    appendPathSegments("profiles", "minecraft")
+                }
+                contentType(ContentType.Application.Json)
+                setBody(names)
+            }
         return if (response.status == HttpStatusCode.OK) {
             response.body()
         } else {
@@ -72,13 +86,23 @@ public class MojangAPIImpl(private val client: HttpClient) : MojangAPI {
     }
 
     override suspend fun getName(uuid: String): ProfileId? {
-        val response = client.get("https://api.mojang.com/user/profile/$uuid")
+        val response =
+            client.get {
+                url(scheme = "https", host = "api.mojang.com") {
+                    appendPathSegments("user", "profile", uuid)
+                }
+            }
         return if (response.status == HttpStatusCode.OK) response.body() else null
     }
 
     override suspend fun getSkin(uuid: String): ProfileSkin? {
-        val response = client.get("https://sessionserver.mojang.com/session/minecraft/profile/$uuid?unsigned=false")
+        val response =
+            client.get {
+                url(scheme = "https", host = "sessionserver.mojang.com") {
+                    appendPathSegments("session", "minecraft", "profile", uuid)
+                    parameter("unsigned", "false")
+                }
+            }
         return if (response.status == HttpStatusCode.OK) response.body() else null
     }
-
 }

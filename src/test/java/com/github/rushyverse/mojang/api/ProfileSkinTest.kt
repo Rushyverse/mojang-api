@@ -1,7 +1,7 @@
 package com.github.rushyverse.mojang.api
 
 import com.github.rushyverse.mojang.api.utils.getRandomString
-import io.ktor.util.*
+import io.ktor.util.encodeBase64
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.DisplayName
@@ -11,11 +11,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ProfileSkinTest {
-
     @Nested
     @DisplayName("Textures property")
     inner class TexturesProperty {
-
         @Test
         fun `if properties is empty, throws exception`() {
             val skin =
@@ -77,40 +75,46 @@ class ProfileSkinTest {
     @Nested
     @DisplayName("Skin decoded")
     inner class SkinDecoded {
-
         @Test
         fun `decode the skin property to build object`() {
-            val skinDecoded = ProfileSkinDecoded(
-                timestamp = System.currentTimeMillis(),
-                profileId = getRandomString(),
-                profileName = getRandomString(),
-                textures = ProfileSkinDecoded.Textures(
-                    skin = ProfileSkinDecoded.Textures.Skin(
-                        url = getRandomString(),
-                        metadata = ProfileSkinDecoded.Textures.Skin.Metadata(
-                            model = getRandomString()
-                        )
-                    ),
-                    cape = ProfileSkinDecoded.Textures.Cape(
-                        url = getRandomString()
-                    )
+            val skinDecoded =
+                ProfileSkinDecoded(
+                    timestamp = System.currentTimeMillis(),
+                    profileId = getRandomString(),
+                    profileName = getRandomString(),
+                    textures =
+                        ProfileSkinDecoded.Textures(
+                            skin =
+                                ProfileSkinDecoded.Textures.Skin(
+                                    url = getRandomString(),
+                                    metadata =
+                                        ProfileSkinDecoded.Textures.Skin.Metadata(
+                                            model = getRandomString(),
+                                        ),
+                                ),
+                            cape =
+                                ProfileSkinDecoded.Textures.Cape(
+                                    url = getRandomString(),
+                                ),
+                        ),
                 )
-            )
 
             val encoded = Json.encodeToString(skinDecoded).encodeBase64()
 
-            val profileSkin = ProfileSkin(
-                id = getRandomString(), name = getRandomString(), properties = listOf(
-                    ProfileSkin.Property(name = "textures", value = encoded, signature = getRandomString())
+            val profileSkin =
+                ProfileSkin(
+                    id = getRandomString(),
+                    name = getRandomString(),
+                    properties =
+                        listOf(
+                            ProfileSkin.Property(name = "textures", value = encoded, signature = getRandomString()),
+                        ),
                 )
-            )
 
             val skinDecodedLoad = profileSkin.getSkinDecoded()
             assertEquals(skinDecoded, skinDecodedLoad)
         }
-
     }
 
-    private fun createRandomProperties() =
-        List(5) { ProfileSkin.Property(name = getRandomString(), getRandomString()) }.toMutableList()
+    private fun createRandomProperties() = List(5) { ProfileSkin.Property(name = getRandomString(), getRandomString()) }.toMutableList()
 }

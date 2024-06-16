@@ -1,7 +1,7 @@
 import io.gitlab.arturbosch.detekt.Detekt
-import org.gradle.internal.impldep.org.testng.reporters.XMLUtils.xml
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     libs.plugins.run {
@@ -10,6 +10,7 @@ plugins {
         alias(dokka)
         alias(detekt)
         alias(kover)
+        alias(ktlint)
     }
     `java-library`
     `maven-publish`
@@ -53,6 +54,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.kt.coroutines.test)
     testImplementation(libs.ktor.cio)
+    testImplementation(libs.ktor.logging)
 }
 
 kotlin {
@@ -82,6 +84,17 @@ tasks {
         compilerOptions {
             jvmTarget = jvmTargetVersion
         }
+    }
+
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        reporters {
+            reporter(ReporterType.HTML)
+            reporter(ReporterType.CHECKSTYLE)
+        }
+    }
+
+    withType<org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask> {
+        reportsOutputDirectory.set(reportFolder.resolve("klint/$name"))
     }
 
     test {
@@ -123,12 +136,13 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(sourceSets.main.get().allSource)
 }
 
-val javadocJar = tasks.register<Jar>("javadocJar") {
-    group = "documentation"
-    dependsOn(tasks.dokkaHtml)
-    archiveClassifier.set("javadoc")
-    from(dokkaOutputDir)
-}
+val javadocJar =
+    tasks.register<Jar>("javadocJar") {
+        group = "documentation"
+        dependsOn(tasks.dokkaHtml)
+        archiveClassifier.set("javadoc")
+        from(dokkaOutputDir)
+    }
 
 publishing {
     val projectName = project.name

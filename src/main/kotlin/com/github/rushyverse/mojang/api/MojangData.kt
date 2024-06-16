@@ -1,7 +1,7 @@
 package com.github.rushyverse.mojang.api
 
 import com.github.rushyverse.mojang.api.serializer.StringUUIDSerializer
-import io.ktor.util.*
+import io.ktor.util.decodeBase64String
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -20,7 +20,7 @@ private const val PROPERTY_TEXTURES = "textures"
 public data class ProfileId(
     val name: String,
     @Serializable(with = StringUUIDSerializer::class)
-    val id: String
+    val id: String,
 )
 
 /**
@@ -49,9 +49,8 @@ public data class ProfileSkin(
     val id: String,
     val name: String,
     val properties: List<Property> = emptyList(),
-    val legacy: Boolean = false
+    val legacy: Boolean = false,
 ) {
-
     /**
      * Property linked to the texture.
      * @property name Name of the property.
@@ -80,7 +79,6 @@ public data class ProfileSkin(
      * @return All information present into the encoded value.
      */
     public fun getSkinDecoded(): ProfileSkinDecoded = ProfileSkinDecoded.fromEncoded(skin)
-
 }
 
 /**
@@ -96,13 +94,13 @@ public data class ProfileSkinDecoded(
     @Serializable(with = StringUUIDSerializer::class)
     val profileId: String,
     val profileName: String,
-    val textures: Textures
+    val textures: Textures,
 ) {
     public companion object {
-
-        private val json: Json = Json {
-            ignoreUnknownKeys = true
-        }
+        private val json: Json =
+            Json {
+                ignoreUnknownKeys = true
+            }
 
         /**
          * Read a Base64 encoded value and load a new instance of [ProfileSkinDecoded] with the json retrieved.
@@ -122,9 +120,8 @@ public data class ProfileSkinDecoded(
     @Serializable
     public data class Textures(
         @SerialName("SKIN") val skin: Skin,
-        @SerialName("CAPE") val cape: Cape? = null
+        @SerialName("CAPE") val cape: Cape? = null,
     ) {
-
         /**
          * Contains all information about the skin of a player.
          * @property url URL to get the skin.
@@ -132,14 +129,12 @@ public data class ProfileSkinDecoded(
          */
         @Serializable
         public data class Skin(val url: String, val metadata: Metadata = Metadata()) {
-
             /**
              * Metadata of the skin texture.
              * @property model alex (slim) or steve (classic).
              */
             @Serializable
             public data class Metadata(val model: String = "classic")
-
         }
 
         /**
@@ -148,6 +143,5 @@ public data class ProfileSkinDecoded(
          */
         @Serializable
         public data class Cape(val url: String)
-
     }
 }
