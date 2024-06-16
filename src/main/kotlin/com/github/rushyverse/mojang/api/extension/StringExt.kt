@@ -26,7 +26,7 @@ private val uuidWithoutDashesRegex: Regex =
 public fun String.formatUUID(): String {
     return if (matches(uuidRegex)) {
         this
-    } else if(matches(uuidWithoutDashesRegex)) {
+    } else if (matches(uuidWithoutDashesRegex)) {
         replace(uuidWithoutDashesRegex, "$1-$2-$3-$4-$5")
     } else {
         throw IllegalArgumentException("Invalid UUID format for string: [$this]")

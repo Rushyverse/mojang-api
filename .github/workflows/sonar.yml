@@ -13,6 +13,8 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name == 'pull_request' && github.event.pull_request.user.login != 'renovate[bot]'
+
     name: Build and analyze
     runs-on: ubuntu-latest
     steps:
@@ -24,12 +26,27 @@ jobs:
         with:
           jdk: 17
 
-      - name: Build
-        uses: gradle/gradle-build-action@v2.9.0
+      - name: Check code style
+        uses: gradle/actions/setup-gradle@v3
         env:
           DETEKT_IGNORE_FAILURES: true
         with:
-          arguments: build detekt test jacocoTestReport
+          arguments: detekt
+
+      - name: Build
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          arguments: assemble
+
+      - name: Test
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          arguments: test
+
+      - name: Generate test report
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          arguments: koverXmlReport
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master

@@ -14,13 +14,16 @@ import kotlinx.serialization.encoding.Encoder
  * @see formatUUID
  */
 public object StringUUIDSerializer : KSerializer<String> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor(
+            "stringUuid",
+            PrimitiveKind.STRING,
+        )
 
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
-        "stringUuid",
-        PrimitiveKind.STRING
-    )
-
-    override fun serialize(encoder: Encoder, value: String) {
+    override fun serialize(
+        encoder: Encoder,
+        value: String,
+    ) {
         encoder.encodeString(value.formatUUID())
     }
 

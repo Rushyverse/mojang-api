@@ -1,31 +1,46 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    embeddedKotlin("jvm")
-    embeddedKotlin("plugin.serialization")
-    id("org.jetbrains.dokka") version "1.9.10"
-    id("io.gitlab.arturbosch.detekt") version "1.23.1"
+    libs.plugins.run {
+        alias(kt.jvm)
+        alias(kt.serialization)
+        alias(dokka)
+        alias(detekt)
+        alias(kover)
+        alias(ktlint)
+    }
     `java-library`
     `maven-publish`
-    jacoco
 }
 
-val javaVersion get() = JavaVersion.VERSION_17
-val javaVersionString get() = javaVersion.toString()
-val javaVersionInt get() = javaVersionString.toInt()
+val jvmTargetVersion = JvmTarget.JVM_17
+
+val reportFolder = rootProject.file("reports")
+val generatedFolder = layout.buildDirectory.dir("generated").get()
+val dokkaOutputDir = rootProject.file("dokka")
 
 detekt {
-    // Allows having different behavior for CI.
-    // When building a branch, we want to fail the build if detekt fails.
-    // When building a PR, we want to ignore failures to report them in sonar.
-    val envIgnoreFailures = System.getenv("DETEKT_IGNORE_FAILURES")?.toBooleanStrictOrNull() ?: false
-    ignoreFailures = envIgnoreFailures
-
+    ignoreFailures = System.getenv("DETEKT_IGNORE_FAILURES")?.toBooleanStrictOrNull() ?: false
     config.from(file("config/detekt/detekt.yml"))
+    reportsDir = reportFolder.resolve("detekt")
 }
 
-jacoco {
-    reportsDirectory.set(file("${layout.buildDirectory.get()}/reports/jacoco"))
+kover {
+    reports {
+        val reportKoverFolder = reportFolder.resolve("kover")
+
+        total {
+            xml {
+                this.xmlFile.set(reportKoverFolder.resolve("xml/result.xml"))
+            }
+            html {
+                this.htmlDir.set(reportKoverFolder.resolve("html"))
+            }
+        }
+    }
 }
 
 repositories {
@@ -33,29 +48,24 @@ repositories {
 }
 
 dependencies {
-    val ktorVersion="2.3.5"
-    val ktSerializationVersion="1.6.0"
-    val coroutineVersion="1.7.3"
-
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-serialization:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ktSerializationVersion")
+    api(libs.bundles.ktor)
+    api(libs.kt.serialization.json)
 
     testImplementation(kotlin("test"))
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineVersion")
-    testImplementation("io.ktor:ktor-client-cio:$ktorVersion")
+    testImplementation(libs.kt.coroutines.test)
+    testImplementation(libs.ktor.cio)
+    testImplementation(libs.ktor.logging)
+    testImplementation(libs.slf4j.simple)
 }
 
 kotlin {
     explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
-    jvmToolchain(javaVersionInt)
+    jvmToolchain(jvmTargetVersion.target.toInt())
 
     sourceSets {
         main {
             kotlin {
-                srcDir("build/generated")
+                srcDir(generatedFolder)
             }
         }
 
@@ -70,11 +80,22 @@ kotlin {
     }
 }
 
-val dokkaOutputDir = "${rootProject.projectDir}/dokka"
-
 tasks {
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = javaVersionString
+        compilerOptions {
+            jvmTarget = jvmTargetVersion
+        }
+    }
+
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        reporters {
+            reporter(ReporterType.HTML)
+            reporter(ReporterType.CHECKSTYLE)
+        }
+    }
+
+    withType<org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask> {
+        reportsOutputDirectory.set(reportFolder.resolve("klint/$name"))
     }
 
     test {
@@ -93,14 +114,19 @@ tasks {
     dokkaHtml.configure {
         // CompileJava should be executed to build library in Jitpack
         dependsOn(deleteDokkaOutputDir, compileJava.get())
-        outputDirectory.set(file(dokkaOutputDir))
+        outputDirectory.set(dokkaOutputDir)
     }
 
-    jacocoTestReport {
+    withType<Detekt>().configureEach {
+        jvmTarget = jvmTargetVersion.target
+        exclude("**/${generatedFolder.asFile.name}/**")
+
         reports {
-            xml.required.set(true)
             html.required.set(true)
-            csv.required.set(false)
+            xml.required.set(true)
+            txt.required.set(false)
+            sarif.required.set(false)
+            md.required.set(false)
         }
     }
 }
@@ -111,12 +137,13 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(sourceSets.main.get().allSource)
 }
 
-val javadocJar = tasks.register<Jar>("javadocJar") {
-    group = "documentation"
-    dependsOn(tasks.dokkaHtml)
-    archiveClassifier.set("javadoc")
-    from(dokkaOutputDir)
-}
+val javadocJar =
+    tasks.register<Jar>("javadocJar") {
+        group = "documentation"
+        dependsOn(tasks.dokkaHtml)
+        archiveClassifier.set("javadoc")
+        from(dokkaOutputDir)
+    }
 
 publishing {
     val projectName = project.name

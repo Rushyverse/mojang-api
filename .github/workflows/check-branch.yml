@@ -12,7 +12,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validation:
+    name: Validate Gradle Wrapper
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: gradle/actions/wrapper-validation@v3
+
+  format:
+    needs: [ validation ]
+    name: Verify Code Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialization
+        uses: ./.github/actions/init
+
+      - name: Check format
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          arguments: ktlintCheck
+
+      - name: Check code style
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          arguments: detekt
+
   build:
+    needs: [ validation, format ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout project
@@ -23,12 +52,19 @@ jobs:
         with:
           jdk: 17
 
-      - name: Build
-        uses: gradle/gradle-build-action@v2.9.0
+      - name: Check code style
+        uses: gradle/actions/setup-gradle@v3
+        env:
+          DETEKT_IGNORE_FAILURES: true
         with:
-          arguments: build -x test
+          arguments: detekt
+
+      - name: Build
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          arguments: assemble
 
       - name: Test
-        uses: gradle/gradle-build-action@v2.9.0
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: test

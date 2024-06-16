@@ -2,15 +2,13 @@ package com.github.rushyverse.mojang.api.extension
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.assertThrows
-import java.util.*
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class StringExtTest {
-
     @Nested
     inner class FormatUUID {
-
         @Test
         fun `should return the same string if it is already formatted`() {
             repeat(100) {
@@ -26,7 +24,7 @@ class StringExtTest {
                 "12345678-12g4-1234-1234-123456789012",
                 "12345678-1234-12q4-1234-123456789012",
                 "12345678-1234-1234-12x4-123456789012",
-                "12345678-1234-1234-1234-12345678901g"
+                "12345678-1234-1234-1234-12345678901g",
             ).forEach {
                 val ex = assertThrows<IllegalArgumentException> { it.formatUUID() }
                 assertEquals("Invalid UUID format for string: [$it]", ex.message)
