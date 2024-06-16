@@ -52,13 +52,6 @@ jobs:
         with:
           jdk: 17
 
-      - name: Check code style
-        uses: gradle/actions/setup-gradle@v3
-        env:
-          DETEKT_IGNORE_FAILURES: true
-        with:
-          arguments: detekt
-
       - name: Build
         uses: gradle/actions/setup-gradle@v3
         with:
