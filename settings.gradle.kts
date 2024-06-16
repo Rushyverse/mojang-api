@@ -19,6 +19,7 @@ dependencyResolutionManagement {
             version("ktor", "2.3.11")
             version("kotlin-serialization", "1.6.3")
             version("kotlin-coroutine", "1.9.0-RC")
+            version("slf4j", "2.0.13")
 
             plugin("kt-jvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
             plugin("kt-serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef("kotlin")
@@ -35,6 +36,8 @@ dependencyResolutionManagement {
             library("ktor-serialization-json", "io.ktor", "ktor-serialization-kotlinx-json").versionRef("ktor")
 
             library("kt-serialization-json", "org.jetbrains.kotlinx", "kotlinx-serialization-json").versionRef("kotlin-serialization")
+
+            library("slf4j-simple", "org.slf4j", "slf4j-simple").versionRef("slf4j")
 
             // Test
             library("kt-coroutines-test", "org.jetbrains.kotlinx", "kotlinx-coroutines-test").versionRef("kotlin-coroutine")

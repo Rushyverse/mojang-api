@@ -55,6 +55,7 @@ dependencies {
     testImplementation(libs.kt.coroutines.test)
     testImplementation(libs.ktor.cio)
     testImplementation(libs.ktor.logging)
+    testImplementation(libs.slf4j.simple)
 }
 
 kotlin {
