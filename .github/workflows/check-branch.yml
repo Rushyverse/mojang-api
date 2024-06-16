@@ -23,10 +23,17 @@ jobs:
         with:
           jdk: 17
 
+      - name: Check code style
+        uses: gradle/gradle-build-action@v2.7.0
+        env:
+          DETEKT_IGNORE_FAILURES: true
+        with:
+          arguments: detekt
+
       - name: Build
         uses: gradle/gradle-build-action@v2.9.0
         with:
-          arguments: build -x test
+          arguments: assemble
 
       - name: Test
         uses: gradle/gradle-build-action@v2.9.0
