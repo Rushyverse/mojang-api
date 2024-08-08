@@ -19,7 +19,7 @@ dependencyResolutionManagement {
             version("ktor", "2.3.11")
             version("kotlin-serialization", "1.6.3")
             version("kotlin-coroutine", "1.9.0-RC")
-            version("slf4j", "2.0.13")
+            version("slf4j", "2.0.15")
 
             plugin("kt-jvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
             plugin("kt-serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef("kotlin")
