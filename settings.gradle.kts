@@ -12,7 +12,7 @@ dependencyResolutionManagement {
             version("kotlin", "2.0.10")
             version("dokka", "1.9.20")
             version("detekt", "1.23.6")
-            version("kover", "0.8.1")
+            version("kover", "0.8.3")
             version("ktlint", "12.1.1")
 
             // Dependency version
