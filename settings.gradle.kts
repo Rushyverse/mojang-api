@@ -11,7 +11,7 @@ dependencyResolutionManagement {
             // Plugin version
             version("kotlin", "2.0.20")
             version("dokka", "1.9.20")
-            version("detekt", "1.23.6")
+            version("detekt", "1.23.7")
             version("kover", "0.8.3")
             version("ktlint", "12.1.1")
 
