@@ -16,7 +16,7 @@ dependencyResolutionManagement {
             version("ktlint", "12.1.1")
 
             // Dependency version
-            version("ktor", "2.3.12")
+            version("ktor", "3.0.0")
             version("kotlin-serialization", "1.6.3")
             version("kotlin-coroutine", "1.9.0")
             version("slf4j", "2.0.16")
