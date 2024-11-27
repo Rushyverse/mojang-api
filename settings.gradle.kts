@@ -9,7 +9,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // Plugin version
-            version("kotlin", "2.0.21")
+            version("kotlin", "2.1.0")
             version("dokka", "1.9.20")
             version("detekt", "1.23.6")
             version("kover", "0.8.3")
