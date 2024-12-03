@@ -27,24 +27,24 @@ jobs:
           jdk: 17
 
       - name: Check code style
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         env:
           DETEKT_IGNORE_FAILURES: true
         with:
           arguments: detekt
 
       - name: Build
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           arguments: assemble
 
       - name: Test
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           arguments: test
 
       - name: Generate test report
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           arguments: koverXmlReport
 
