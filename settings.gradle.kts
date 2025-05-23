@@ -13,7 +13,7 @@ dependencyResolutionManagement {
             version("dokka", "2.0.0")
             version("detekt", "1.23.6")
             version("kover", "0.8.3")
-            version("ktlint", "12.1.2")
+            version("ktlint", "12.3.0")
 
             // Dependency version
             version("ktor", "3.0.3")
